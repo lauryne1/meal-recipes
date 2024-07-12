@@ -1,0 +1,5 @@
+- [] on fetch les categories
+- [] on fetch les zones
+- [] on entre un texte, ça lance la recherche
+- [] on affiche le resultat de la recherche dans la vue
+- [] quand l'utilisateur clique sur un plat, on ouvre une vue qui fetch les informations de cette recette et les affiche
