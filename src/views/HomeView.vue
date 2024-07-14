@@ -11,14 +11,14 @@
           <div class="flex gap-3">
             <Select
               v-model="sortKey"
-              :options="store.categories"
+              :options="categories"
               optionLabel="label"
               placeholder="Sort By Category"
               @change="onSortChange($event)"
             />
             <Select
               v-model="sortKey"
-              :options="store.areas"
+              :options="areas"
               optionLabel="label"
               placeholder="Sort By Area"
               @change="onSortChange($event)"
@@ -28,6 +28,9 @@
       </template>
 
       <template #grid="slotProps">
+        <!-- <div class="flex justify-center">
+          <Empty />
+        </div> -->
         <div class="grid grid-cols-12 gap-4">
           <div
             v-for="(item, index) in slotProps.items"
@@ -74,25 +77,51 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useStore } from '@/stores/counter'
-import Select from 'primevue/select'
+<script setup>
+import { ref, onMounted } from 'vue'
+
+import SelectButton from 'primevue/selectbutton'
+import Tag from 'primevue/tag'
 import DataView from 'primevue/dataview'
+import Select from 'primevue/select'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import Tag from 'primevue/tag'
+import LoadingView from '@/components/LoadingView.vue'
 import Paginator from 'primevue/paginator'
 import Empty from '@/components/icons/Empty.vue'
+import axios from 'axios'
+import { fetchAreas, fetchCategories } from '@/api'
 import { useRouter } from 'vue-router'
 
-const store = useStore()
 const router = useRouter()
 
-const value1 = ref('')
-const sortKey = ref(null)
-const layout = ref('grid')
+// const categories = ref([])
+// const areas = ref([])
+
+// onMounted(async () => {
+//   console.log('-----------', categories.value)
+//   categories.value = await fetchCategories()
+//   areas.value = await fetchAreas()
+// })
+const props = defineProps({
+  categories: {
+    type: Array,
+    required: true
+  },
+  areas: {
+    type: Array,
+    required: true
+  }
+})
+
+console.log('Categories received in HomeView.vue:', props.categories)
+console.log('Areas received in HomeView.vue:', props.areas)
+
+const onMealClick = () => {
+  router.push('/detail')
+}
+
 const products = ref([
   {
     id: '1000',
@@ -168,28 +197,10 @@ const products = ref([
   }
 ])
 
-const onMealClick = () => {
-  router.push('/detail')
-}
+const layout = ref('grid')
+const layoutOptions = ref(['list', 'grid'])
 
-const onSortChange = (event: Event) => {
-  // Logique de tri à ajouter ici
-}
-
-// const getSeverity = () => {
-//   switch () {
-//     case 'INSTOCK':
-//       return 'success'
-//     case 'LOWSTOCK':
-//       return 'warn'
-//     case 'OUTOFSTOCK':
-//       return 'danger'
-//     default:
-//       return null
-//   }
-// }
-
-const getSeverity = (product: { inventoryStatus: any }) => {
+const getSeverity = (product) => {
   switch (product.inventoryStatus) {
     case 'INSTOCK':
       return 'success'
