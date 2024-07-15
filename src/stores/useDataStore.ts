@@ -1,30 +1,26 @@
-
-
-import { defineStore } from 'pinia';
-import { fetchCategories } from '../api/index';
+import { defineStore } from 'pinia'
+import { fetchCategories } from '../api/index'
 import { fetchAreas } from '../api/index'
 
-
 export interface Category {
-  id: number;
-  label: string;
+  id: number
+  label: string
 }
 
 export const useCategoryStore = defineStore('category', {
   state: () => ({
-    categories: [] as Category[],
+    categories: [] as Category[]
   }),
   actions: {
     async loadCategories() {
       try {
-        this.categories = await fetchCategories();
+        this.categories = await fetchCategories()
       } catch (error) {
-        console.error('Failed to load categories:', error);
+        console.error('Failed:', error)
       }
-    },
-  },
-});
-
+    }
+  }
+})
 
 export interface Area {
   id: number

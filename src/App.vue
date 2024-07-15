@@ -2,17 +2,19 @@
   <RouterView :categories="categories" :areas="areas" />
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { fetchCategories, fetchAreas, type Category, type Area } from '@/api/index'
-const categories = ref<Category[]>([])
-const areas = ref<Area[]>([])
+<script setup>
+import { onMounted, computed } from 'vue'
+import { useCategoryStore } from './stores/useDataStore.ts'
+import { useAreaStore } from './stores/useDataStore.ts'
+
+const categoryStore = useCategoryStore()
+const areaStore = useAreaStore()
 
 onMounted(async () => {
-  categories.value = await fetchCategories()
-  areas.value = await fetchAreas()
-
-  console.log('Categories loaded in App.vue:', categories.value)
-  console.log('Areas loaded in App.vue:', areas.value)
+  await categoryStore.loadCategories()
+  await areaStore.loadAreas()
 })
+
+const categories = computed(() => categoryStore.categories)
+const areas = computed(() => areaStore.areas)
 </script>
