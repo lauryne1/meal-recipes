@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchCategories } from '../api/index'
-import { fetchAreas } from '../api/index'
+import { fetchCategories, fetchAreas} from '../api/index'
 
 export interface Category {
   id: number

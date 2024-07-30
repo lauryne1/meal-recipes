@@ -1,11 +1,10 @@
 <template>
-  <RouterView :categories="categories" :areas="areas" />
+  <router-view />
 </template>
 
-<script setup>
-import { onMounted, computed } from 'vue'
-import { useCategoryStore } from './stores/useDataStore.ts'
-import { useAreaStore } from './stores/useDataStore.ts'
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { useCategoryStore, useAreaStore } from '@/stores/index'
 
 const categoryStore = useCategoryStore()
 const areaStore = useAreaStore()
@@ -13,8 +12,9 @@ const areaStore = useAreaStore()
 onMounted(async () => {
   await categoryStore.loadCategories()
   await areaStore.loadAreas()
+  console.log('!@#$%', categoryStore.categories)
+  console.log(')(*&&&^)', areaStore.areas)
 })
-
-const categories = computed(() => categoryStore.categories)
-const areas = computed(() => areaStore.areas)
 </script>
+
+<style></style>
