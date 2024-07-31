@@ -88,6 +88,7 @@ import { useRouter } from 'vue-router'
 import { useAreaStore, useCategoryStore } from '@/stores'
 import debounce from 'lodash.debounce'
 const router = useRouter()
+import { searchMeals } from '@/api/index'
 
 const categoryStore = useCategoryStore()
 const areaStore = useAreaStore()
@@ -170,17 +171,22 @@ const products = ref([
 const searchQuery = ref('')
 const filteredProducts = ref(products.value)
 
-const updateFilteredProducts = debounce(() => {
+const updateFilteredProducts = debounce(async () => {
   if (searchQuery.value.trim()) {
-    filteredProducts.value = products.value.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
+    const meals = await searchMeals(searchQuery.value)
+    console.log('!@#$E%R%^R^', meals)
+    filteredProducts.value = meals.map((meal: any) => ({
+      id: meal.idMeal,
+      name: meal.strMeal,
+      category: meal.strCategory
+    }))
   } else {
     filteredProducts.value = products.value
   }
 }, 500)
 
 watch(searchQuery, () => {
+  console.log('@@@@', searchQuery.value)
   updateFilteredProducts()
 })
 

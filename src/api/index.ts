@@ -58,3 +58,16 @@ export async function fetchAreas(): Promise<Area[]> {
     return []
   }
 }
+
+
+
+
+export async function searchMeals(term: string): Promise<any> {
+  try {
+    const { data } = await axios.get(`https://www.themealdb.com/api/json/v1/1/search.php?s=${term}`)
+    return data.meals || []
+  } catch (error) {
+    console.error('Error fetching meals:', error)
+    return []
+  }
+}
