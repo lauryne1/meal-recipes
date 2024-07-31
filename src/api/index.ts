@@ -39,7 +39,6 @@ export async function fetchAreas(): Promise<Area[]> {
     const { data, status } = await axios.get(
       'https://www.themealdb.com/api/json/v1/1/list.php?a=list'
     )
-    // console.log('_)(*&^', data)
     return data.meals.map(
       (
         el: {
