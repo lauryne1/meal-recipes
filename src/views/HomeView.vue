@@ -40,7 +40,7 @@
                 <div class="relative mx-auto">
                   <img
                     class="rounded w-full"
-                    :src="`https://www.themealdb.com/images/media/meals/xvsurr1511719182.jpg`"
+                    :src="item.thumb"
                     :alt="item.name"
                     style="max-width: 300px"
                   />
@@ -49,17 +49,13 @@
               <div class="pt-6">
                 <div class="flex flex-row justify-between items-start gap-2">
                   <div>
-                    <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{
-                      item.category
-                    }}</span>
+                    <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">
+                      {{ item.area }}
+                    </span>
                     <div class="text-lg font-medium mt-1">{{ item.name }}</div>
                   </div>
 
-                  <Tag
-                    :value="item.inventoryStatus"
-                    :severity="getSeverity(item)"
-                    style="left: 4px; top: 4px"
-                  ></Tag>
+                  <span class="text-sm font-medium text-green-500">{{ item.category }}</span>
                 </div>
               </div>
             </div>
@@ -88,105 +84,27 @@ import { useRouter } from 'vue-router'
 import { useAreaStore, useCategoryStore } from '@/stores'
 import debounce from 'lodash.debounce'
 const router = useRouter()
-import { searchMeals } from '@/api/index'
+import { searchMeals, type Meal } from '@/api/index'
 
 const categoryStore = useCategoryStore()
 const areaStore = useAreaStore()
 
-const products = ref([
-  {
-    id: '1000',
-    code: 'f230fh0g3',
-    name: 'Bamboo Watch',
-    description: 'Product Description',
-    image: 'bamboo-watch.jpg',
-    price: 65,
-    category: 'Accessories',
-    quantity: 24,
-    inventoryStatus: 'INSTOCK',
-    rating: 5
-  },
-  {
-    id: '1001',
-    code: 'nvklal433',
-    name: 'Black Watch',
-    description: 'Product Description',
-    image: 'black-watch.jpg',
-    price: 72,
-    category: 'Accessories',
-    quantity: 61,
-    inventoryStatus: 'INSTOCK',
-    rating: 4
-  },
-  {
-    id: '1002',
-    code: 'zz21cz3c1',
-    name: 'Blue Band',
-    description: 'Product Description',
-    image: 'blue-band.jpg',
-    price: 79,
-    category: 'Fitness',
-    quantity: 2,
-    inventoryStatus: 'LOWSTOCK',
-    rating: 3
-  },
-  {
-    id: '1003',
-    code: '244wgerg2',
-    name: 'Blue T-Shirt',
-    description: 'Product Description',
-    image: 'blue-t-shirt.jpg',
-    price: 29,
-    category: 'Clothing',
-    quantity: 25,
-    inventoryStatus: 'INSTOCK',
-    rating: 5
-  },
-  {
-    id: '1004',
-    code: 'h456wer53',
-    name: 'Bracelet',
-    description: 'Product Description',
-    image: 'bracelet.jpg',
-    price: 15,
-    category: 'Accessories',
-    quantity: 73,
-    inventoryStatus: 'INSTOCK',
-    rating: 4
-  },
-  {
-    id: '1005',
-    code: 'av2231fwg',
-    name: 'Brown Purse',
-    description: 'Product Description',
-    image: 'brown-purse.jpg',
-    price: 120,
-    category: 'Accessories',
-    quantity: 0,
-    inventoryStatus: 'OUTOFSTOCK',
-    rating: 4
-  }
-])
-
+const products = ref<Meal[]>([])
 const searchQuery = ref('')
-const filteredProducts = ref(products.value)
+const filteredProducts = ref<Meal[]>(products.value)
 
 const updateFilteredProducts = debounce(async () => {
   if (searchQuery.value.trim()) {
     const meals = await searchMeals(searchQuery.value)
-    console.log('!@#$E%R%^R^', meals)
-    filteredProducts.value = meals.map((meal: any) => ({
-      id: meal.idMeal,
-      name: meal.strMeal,
-      category: meal.strCategory
-    }))
+    console.log('Fetched meals:', meals)
+    filteredProducts.value = meals
   } else {
     filteredProducts.value = products.value
   }
 }, 500)
 
 watch(searchQuery, () => {
-  console.log('@@@@', searchQuery.value)
+  console.log('Search query:', searchQuery.value)
   updateFilteredProducts()
 })
 
@@ -194,21 +112,6 @@ const layout = ref('grid')
 const layoutOptions = ref(['list', 'grid'])
 
 const sortKey = ref('')
-const getSeverity = (product: { inventoryStatus: any }) => {
-  switch (product.inventoryStatus) {
-    case 'INSTOCK':
-      return 'success'
-
-    case 'LOWSTOCK':
-      return 'warn'
-
-    case 'OUTOFSTOCK':
-      return 'danger'
-
-    default:
-      return null
-  }
-}
 
 const onMealClick = () => {
   router.push('/detail')
