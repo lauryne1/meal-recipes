@@ -1,6 +1,6 @@
 <template>
   <div class="px-80">
-    <DataView :value="filteredProducts" :layout="layout" :rows="5">
+    <DataView :value="filteredProducts" :layout="layout" :rows="limit">
       <template #header>
         <div class="flex justify-between">
           <IconField>
@@ -10,13 +10,13 @@
 
           <div class="flex gap-3">
             <Select
-              v-model="sortKey"
+              v-model="selectedCategory"
               :options="categoryStore.categories"
               optionLabel="label"
               placeholder="Sort By Category"
             />
             <Select
-              v-model="sortKey"
+              v-model="selectedArea"
               :options="areaStore.areas"
               optionLabel="label"
               placeholder="Sort By Area"
@@ -40,7 +40,7 @@
                 <div class="relative mx-auto">
                   <img
                     class="rounded w-full"
-                    :src="item.thumb"
+                    :src="item.thumbnail"
                     :alt="item.name"
                     style="max-width: 300px"
                   />
@@ -50,12 +50,12 @@
                 <div class="flex flex-row justify-between items-start gap-2">
                   <div>
                     <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">
-                      {{ item.area }}
+                      {{ item.area.label }}
                     </span>
                     <div class="text-lg font-medium mt-1">{{ item.name }}</div>
                   </div>
 
-                  <span class="text-sm font-medium text-green-500">{{ item.category }}</span>
+                  <span class="text-sm font-medium text-green-500">{{ item.category.label }}</span>
                 </div>
               </div>
             </div>
@@ -63,57 +63,75 @@
         </div>
       </template>
     </DataView>
-
-    <Paginator :rows="10" :totalRecords="120" :rowsPerPageOptions="[10, 20, 30]"></Paginator>
+    <Paginator
+      :rows="limit"
+      :totalRecords="totalRecords"
+      :rowsPerPageOptions="[10, 20, 30]"
+      @page="onPageChange"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import SelectButton from 'primevue/selectbutton'
-import Tag from 'primevue/tag'
+import { ref, watch, onMounted } from 'vue'
 import DataView from 'primevue/dataview'
 import Select from 'primevue/select'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-// import LoadingView from '@/components/LoadingView.vue'
 import Paginator from 'primevue/paginator'
-import Empty from '@/components/icons/Empty.vue'
 import { useRouter } from 'vue-router'
-import { useAreaStore, useCategoryStore } from '@/stores'
+import { useAreaStore, useCategoryStore } from '../stores'
 import debounce from 'lodash.debounce'
-const router = useRouter()
-import { searchMeals, type Meal } from '@/api/index'
+import { searchMeals, type Meal } from '../api/index'
 
+const router = useRouter()
 const categoryStore = useCategoryStore()
 const areaStore = useAreaStore()
 
 const products = ref<Meal[]>([])
 const searchQuery = ref('')
-const filteredProducts = ref<Meal[]>(products.value)
+const filteredProducts = ref<Meal[]>([])
+const selectedCategory = ref<number | undefined>(undefined)
+const selectedArea = ref<number | undefined>(undefined)
+const limit = ref(10) // Nombre d'éléments par page
+const offset = ref(0) // Offset initial à 0
+const totalRecords = ref(0) // Nombre total d'éléments
 
 const updateFilteredProducts = debounce(async () => {
-  if (searchQuery.value.trim()) {
-    const meals = await searchMeals(searchQuery.value)
-    console.log('Fetched meals:', meals)
-    filteredProducts.value = meals
-  } else {
-    filteredProducts.value = products.value
-  }
+  const { items, count } = await searchMeals(
+    searchQuery.value,
+    selectedCategory.value,
+    selectedArea.value,
+    limit.value,
+    offset.value
+  )
+  console.log('Fetched meals:', items)
+  filteredProducts.value = items
+  totalRecords.value = count
 }, 500)
 
-watch(searchQuery, () => {
-  console.log('Search query:', searchQuery.value)
+watch([searchQuery, selectedCategory, selectedArea, limit], () => {
+  // Réinitialiser l'offset lorsque les filtres changent
+  offset.value = 0
   updateFilteredProducts()
 })
 
 const layout = ref('grid')
-const layoutOptions = ref(['list', 'grid'])
-
-const sortKey = ref('')
 
 const onMealClick = () => {
   router.push('/detail')
 }
+
+const onPageChange = (event: any) => {
+  // Calculer le nouvel offset basé sur la page sélectionnée
+  offset.value = event.page * event.rows
+  limit.value = event.rows
+  updateFilteredProducts()
+}
+
+// Initialiser les produits filtrés lors du montage
+onMounted(() => {
+  updateFilteredProducts()
+})
 </script>
