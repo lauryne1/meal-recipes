@@ -94,9 +94,9 @@ const searchQuery = ref('')
 const filteredProducts = ref<Meal[]>([])
 const selectedCategory = ref<number | undefined>(undefined)
 const selectedArea = ref<number | undefined>(undefined)
-const limit = ref(10) // Nombre d'éléments par page
-const offset = ref(0) // Offset initial à 0
-const totalRecords = ref(0) // Nombre total d'éléments
+const limit = ref(10) 
+const offset = ref(0) 
+const totalRecords = ref(0) 
 
 const updateFilteredProducts = debounce(async () => {
   const { items, count } = await searchMeals(
@@ -112,7 +112,6 @@ const updateFilteredProducts = debounce(async () => {
 }, 500)
 
 watch([searchQuery, selectedCategory, selectedArea, limit], () => {
-  // Réinitialiser l'offset lorsque les filtres changent
   offset.value = 0
   updateFilteredProducts()
 })
@@ -124,13 +123,11 @@ const onMealClick = () => {
 }
 
 const onPageChange = (event: any) => {
-  // Calculer le nouvel offset basé sur la page sélectionnée
   offset.value = event.page * event.rows
   limit.value = event.rows
   updateFilteredProducts()
 }
 
-// Initialiser les produits filtrés lors du montage
 onMounted(() => {
   updateFilteredProducts()
 })
