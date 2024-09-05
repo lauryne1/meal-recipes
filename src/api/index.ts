@@ -30,6 +30,7 @@ export interface Meal {
     label: string
     measure: string
   }>
+  instructions?: string 
 }
 
 
@@ -140,3 +141,13 @@ export async function pagination(
   }
 }
 
+export async function fetchMeal(id: number): Promise<Meal | null> {
+  try {
+    const response = await axios.get(`https://meals.kokoko.tech/meals/${id}`)
+    console.log('API response for meal:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('Error fetching meal details:', error)
+    return null
+  }
+}

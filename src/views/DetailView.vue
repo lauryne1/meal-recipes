@@ -2,28 +2,55 @@
   <div class="w-full h-[100vh] flex justify-center items-center">
     <Card style="width: 25rem; overflow: hidden; height: fit-content">
       <template #header>
-        <img alt="user header" src="https://primefaces.org/cdn/primevue/images/usercard.png" />
+        <img :src="meal?.thumbnail" alt="meal image" />
       </template>
-      <template #title>Advanced Card</template>
-      <template #subtitle>Card subtitle</template>
+      <template #title>{{ meal?.name }}</template>
+      <template #subtitle>{{ meal?.category.label }}</template>
       <template #content>
         <p class="m-0">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error
-          repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa
-          ratione quam perferendis esse, cupiditate neque quas!
+          <span v-if="meal?.ingredients?.length">
+            <span v-for="(ingredient, index) in meal.ingredients" :key="index">
+              {{ ingredient.label }}: {{ ingredient.measure }}
+              <span v-if="index < meal.ingredients.length - 1">, </span>
+            </span>
+          </span>
         </p>
       </template>
       <template #footer>
         <div class="flex gap-4 mt-1">
-          <Button label="Cancel" severity="secondary" outlined class="w-full" />
-          <Button label="Save" class="w-full" @click="$router.back" />
+          <Button label="Back" severity="secondary" outlined class="w-full" @click="goBack" />
         </div>
       </template>
     </Card>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
+import { searchMeals, type Meal } from '../api/index'
+
+const route = useRoute()
+const router = useRouter()
+const meal = ref<Meal | null>(null)
+
+const fetchMeal = async (id: number) => {
+  try {
+    const { items } = await searchMeals('', undefined, undefined, 1, 0)
+    meal.value = items.find(m => m.id === id) || null
+  } catch (error) {
+    console.error('(^%$$)', error)
+  }
+}
+
+const goBack = () => {
+  router.back()
+}
+
+onMounted(() => {
+  const id = Number(route.params.id)
+  fetchMeal(id)
+})
 </script>

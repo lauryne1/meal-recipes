@@ -28,11 +28,11 @@
       <template #grid="slotProps">
         <div class="grid grid-cols-12 gap-4">
           <div
-            v-for="(item, index) in slotProps.items"
-            :key="index"
-            class="col-span-12 sm:col-span-6 md:col-span-4 xl:col-span-6 p-2 cursor-hand"
-            @click="onMealClick"
-          >
+    v-for="(item, index) in slotProps.items"
+    :key="index"
+    class="col-span-12 sm:col-span-6 md:col-span-4 xl:col-span-6 p-2 cursor-pointer"
+    @click="onMealClick(item.id)"
+  >
             <div
               class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col"
             >
@@ -118,8 +118,8 @@ watch([searchQuery, selectedCategory, selectedArea, limit], () => {
 
 const layout = ref('grid')
 
-const onMealClick = () => {
-  router.push('/detail')
+const onMealClick = (id: number) => {
+  router.push({ name: 'Details', params: { id } })
 }
 
 const onPageChange = (event: any) => {
