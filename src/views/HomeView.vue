@@ -31,8 +31,7 @@
     v-for="(item, index) in slotProps.items"
     :key="index"
     class="col-span-12 sm:col-span-6 md:col-span-4 xl:col-span-6 p-2 cursor-pointer"
-    @click="onMealClick(item.id)"
-  >
+  ><router-link :to="{ name: 'Details', params: { id:item.id }}">Voir plus</router-link>
             <div
               class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col"
             >
@@ -120,7 +119,10 @@ const layout = ref('grid')
 
 const onMealClick = (id: number) => {
   router.push({ name: 'Details', params: { id } })
+  
+
 }
+// @click="onMealClick(item.id)"
 
 const onPageChange = (event: any) => {
   offset.value = event.page * event.rows
@@ -128,7 +130,14 @@ const onPageChange = (event: any) => {
   updateFilteredProducts()
 }
 
-onMounted(() => {
-  updateFilteredProducts()
-})
+onMounted(async () => {
+  if (!categoryStore.categories.length) {
+    await categoryStore.loadCategories();
+  }
+  if (!areaStore.areas.length) {
+    await areaStore.loadAreas();
+  }
+  updateFilteredProducts();
+});
+
 </script>
