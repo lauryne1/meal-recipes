@@ -10,12 +10,14 @@
 
           <div class="flex gap-3">
             <Select
+             v-if="categoryStore.categories.length > 0"
               v-model="selectedCategory"
               :options="categoryStore.categories"
               optionLabel="label"
               placeholder="Sort By Category"
             />
             <Select
+             v-if="areaStore.areas.length > 0"
               v-model="selectedArea"
               :options="areaStore.areas"
               optionLabel="label"
@@ -28,10 +30,12 @@
       <template #grid="slotProps">
         <div class="grid grid-cols-12 gap-4">
           <div
-    v-for="(item, index) in slotProps.items"
-    :key="index"
-    class="col-span-12 sm:col-span-6 md:col-span-4 xl:col-span-6 p-2 cursor-pointer"
-  ><router-link :to="{ name: 'Details', params: { id:item.id }}">Voir plus</router-link>
+            v-for="(item, index) in slotProps.items"
+            :key="index"
+            class="col-span-12 sm:col-span-6 md:col-span-4 xl:col-span-6 p-2 cursor-hand"
+            @click="onMealClick(item.id)"
+
+          >
             <div
               class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col"
             >
